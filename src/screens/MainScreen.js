@@ -12,7 +12,7 @@ import Feather from "@expo/vector-icons/Feather";
 import React, { useState, useEffect } from "react";
 import * as ImagePicker from 'expo-image-picker'
 import ImageViewer from "../utils/ImageViewer";
-import Animated, { useSharedValue, useAnimatedStyle, withSpring, useAnimatedGestureHandler } from 'react-native-reanimated'
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, useAnimatedGestureHandler, color } from 'react-native-reanimated'
 import { TapGestureHandler } from "react-native-gesture-handler";
 import * as munsell from 'munsell'
 const initialState = {
@@ -45,35 +45,36 @@ export default function MainScreen({ navigation }) {
     await ImagePicker.launchCameraAsync({
       quality: 1,
       allowsEditing: true
-    }).then(async photo => {
-
+    }).then( async photo => {
+      setShowColorButtons(true)
       setPhoto(photo.uri)
       await ImageColors.getColors(photo.uri, {}).then(r => {
+      
         switch (r.platform) {
           case 'android':
           case 'web':
             setColors({
-              colorOne: { value: result.lightVibrant, name: 'lightVibrant', munsellFormat: munsell.hexToMunsell(result.lightVibrant) },
-              colorTwo: { value: result.dominant, name: 'dominant', munsellFormat: munsell.hexToMunsell(result.dominant) },
-              colorThree: { value: result.vibrant, name: 'vibrant', munsellFormat: munsell.hexToMunsell(result.vibrant) },
-              colorFour: { value: result.darkVibrant, name: 'darkVibrant', munsellFormat: munsell.hexToMunsell(result.darkVibrant) },
-              rawResult: JSON.stringify(result),
+              colorOne: { value: r.lightVibrant, name: 'lightVibrant', munsellFormat: munsell.hexToMunsell(r.lightVibrant) },
+              colorTwo: { value: r.dominant, name: 'dominant', munsellFormat: munsell.hexToMunsell(r.dominant) },
+              colorThree: { value: r.vibrant, name: 'vibrant', munsellFormat: munsell.hexToMunsell(r.vibrant) },
+              colorFour: { value: r.darkVibrant, name: 'darkVibrant', munsellFormat: munsell.hexToMunsell(r.darkVibrant) },
+              rawResult: JSON.stringify(r),
             })
             break
           case 'ios':
             setColors({
-              colorOne: { value: result.background, name: 'background', munsellFormat: munsell.hexToMunsell(result.background) },
-              colorTwo: { value: result.detail, name: 'detail', munsellFormat: munsell.hexToMunsell(result.detail) },
-              colorThree: { value: result.primary, name: 'primary', munsellFormat: munsell.hexToMunsell(result.primary) },
-              colorFour: { value: result.secondary, name: 'secondary', munsellFormat: munsell.hexToMunsell(result.secondary) },
-              rawResult: JSON.stringify(result),
+              colorOne: { value: r.background, name: 'background', munsellFormat: munsell.hexToMunsell(r.background) },
+              colorTwo: { value: r.detail, name: 'detail', munsellFormat: munsell.hexToMunsell(r.detail) },
+              colorThree: { value: r.primary, name: 'primary', munsellFormat: munsell.hexToMunsell(r.primary) },
+              colorFour: { value: r.secondary, name: 'secondary', munsellFormat: munsell.hexToMunsell(r.secondary) },
+              rawResult: JSON.stringify(r),
             })
             break
           default:
             throw new Error('Unexpected platform')
         }
       })
-      setShowColorButtons(true)
+      
     })
 
 
@@ -86,7 +87,7 @@ export default function MainScreen({ navigation }) {
 
       setPhoto(photo.uri)
       setShowColorButtons(true)
-
+      
     })
   }
   const pressed = useSharedValue(false)
@@ -183,11 +184,11 @@ export default function MainScreen({ navigation }) {
 
                     </View>
                     <Animated.View  >
-                      <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize", color: colors.colorThree.value }} >Vibrant</Text>
+                      <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize", color: colors.colorThree.value }} > {colors.colorThree.name}: </Text>
                     </Animated.View>
 
                     <Animated.View >
-                      <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize" }} >Munsel format : {colors.colorThree.munsellFormat}</Text>
+                      <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize" }} >Munsell Format : {colors.colorThree.munsellFormat}</Text>
                     </Animated.View>
                   </View>
 

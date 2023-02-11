@@ -23,7 +23,7 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.header}>
 
                <Text style={styles.title}>Welcome to GeoColor App</Text>
-               <TypeWriter dev= {true} text="With this application, you can extract  main colors of any image and see each color representation in different formats as well." styleText={styles.welcomeText} styleView = {styles.welcome} />
+               <TypeWriter dev= {false} text="With this application, you can extract  main colors of any image and see each color representation in different formats as well." styleText={styles.welcomeText} styleView = {styles.welcome} />
 
             
 
