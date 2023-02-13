@@ -22,13 +22,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptative-icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.fersombra.GeoColor"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "19ca2f18-b2d6-4dec-8e8f-ad0d90ec2940"
+      }
     }
   }
 }

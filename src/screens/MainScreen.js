@@ -2,24 +2,25 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
+
   TouchableOpacity,
-  Image,
+  
   ImageBackground,
-  ActivityIndicator
+
+  Pressable
 } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import React, { useState, useEffect } from "react";
 import * as ImagePicker from 'expo-image-picker'
 import ImageViewer from "../utils/ImageViewer";
 import Animated, { useSharedValue, useAnimatedStyle, withSpring, useAnimatedGestureHandler, color } from 'react-native-reanimated'
-import { TapGestureHandler } from "react-native-gesture-handler";
+import { TapGestureHandler, PanGestureHandler } from "react-native-gesture-handler";
 import * as munsell from 'munsell'
 const initialState = {
-  colorOne: { value: '', name: '', munsellFormat: '' },
-  colorTwo: { value: '', name: '', munsellFormat: '' },
-  colorThree: { value: '', name: '', munsellFormat: '' },
-  colorFour: { value: '', name: '', munsellFormat: '' },
+  colorOne: { value: '', name: '', munsellFormat: '', rgbFormat: [] },
+  colorTwo: { value: '', name: '', munsellFormat: '', rgbFormat: [] },
+  colorThree: { value: '', name: '', munsellFormat: '', rgbFormat: [] },
+  colorFour: { value: '', name: '', munsellFormat: '', rgbFormat: [] },
   rawResult: '',
 }
 import ImageColors from "react-native-image-colors";
@@ -45,28 +46,28 @@ export default function MainScreen({ navigation }) {
     await ImagePicker.launchCameraAsync({
       quality: 1,
       allowsEditing: true
-    }).then( async photo => {
+    }).then(async photo => {
       setShowColorButtons(true)
       setPhoto(photo.uri)
       await ImageColors.getColors(photo.uri, {}).then(r => {
-      
+
         switch (r.platform) {
           case 'android':
           case 'web':
             setColors({
-              colorOne: { value: r.lightVibrant, name: 'lightVibrant', munsellFormat: munsell.hexToMunsell(r.lightVibrant) },
-              colorTwo: { value: r.dominant, name: 'dominant', munsellFormat: munsell.hexToMunsell(r.dominant) },
-              colorThree: { value: r.vibrant, name: 'vibrant', munsellFormat: munsell.hexToMunsell(r.vibrant) },
-              colorFour: { value: r.darkVibrant, name: 'darkVibrant', munsellFormat: munsell.hexToMunsell(r.darkVibrant) },
+              colorOne: { value: r.lightVibrant, name: 'lightVibrant', munsellFormat: munsell.hexToMunsell(r.lightVibrant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.lightVibrant),) },
+              colorTwo: { value: r.dominant, name: 'dominant', munsellFormat: munsell.hexToMunsell(r.dominant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.dominant)) },
+              colorThree: { value: r.vibrant, name: 'vibrant', munsellFormat: munsell.hexToMunsell(r.vibrant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.vibrant)) },
+              colorFour: { value: r.darkVibrant, name: 'darkVibrant', munsellFormat: munsell.hexToMunsell(r.darkVibrant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.darkVibrant)) },
               rawResult: JSON.stringify(r),
             })
             break
           case 'ios':
             setColors({
-              colorOne: { value: r.background, name: 'background', munsellFormat: munsell.hexToMunsell(r.background) },
-              colorTwo: { value: r.detail, name: 'detail', munsellFormat: munsell.hexToMunsell(r.detail) },
-              colorThree: { value: r.primary, name: 'primary', munsellFormat: munsell.hexToMunsell(r.primary) },
-              colorFour: { value: r.secondary, name: 'secondary', munsellFormat: munsell.hexToMunsell(r.secondary) },
+              colorOne: { value: r.background, name: 'background', munsellFormat: munsell.hexToMunsell(r.background), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.background),) },
+              colorTwo: { value: r.detail, name: 'detail', munsellFormat: munsell.hexToMunsell(r.detail), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.detail)) },
+              colorThree: { value: r.primary, name: 'primary', munsellFormat: munsell.hexToMunsell(r.primary), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.primary)) },
+              colorFour: { value: r.secondary, name: 'secondary', munsellFormat: munsell.hexToMunsell(r.secondary), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.secondary)) },
               rawResult: JSON.stringify(r),
             })
             break
@@ -74,7 +75,12 @@ export default function MainScreen({ navigation }) {
             throw new Error('Unexpected platform')
         }
       })
-      
+
+
+    }).catch(err => { 
+      setShowColorButtons(false)
+      setPhoto(null)
+      alert("Take a photo ! ")
     })
 
 
@@ -83,11 +89,42 @@ export default function MainScreen({ navigation }) {
     await ImagePicker.launchImageLibraryAsync({
       quality: 1,
       allowsEditing: true
-    }).then(photo => {
+    }).then(async photo => {
 
       setPhoto(photo.uri)
       setShowColorButtons(true)
-      
+      await ImageColors.getColors(photo.uri, {}).then(r => {
+
+        switch (r.platform) {
+          case 'android':
+          case 'web':
+            setColors({
+              colorOne: { value: r.lightVibrant, name: 'lightVibrant', munsellFormat: munsell.hexToMunsell(r.lightVibrant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.lightVibrant),) },
+              colorTwo: { value: r.dominant, name: 'dominant', munsellFormat: munsell.hexToMunsell(r.dominant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.dominant)) },
+              colorThree: { value: r.vibrant, name: 'vibrant', munsellFormat: munsell.hexToMunsell(r.vibrant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.vibrant)) },
+              colorFour: { value: r.darkVibrant, name: 'darkVibrant', munsellFormat: munsell.hexToMunsell(r.darkVibrant), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.darkVibrant)) },
+              rawResult: JSON.stringify(r),
+            })
+            break
+          case 'ios':
+            setColors({
+              colorOne: { value: r.background, name: 'background', munsellFormat: munsell.hexToMunsell(r.background), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.background),) },
+              colorTwo: { value: r.detail, name: 'detail', munsellFormat: munsell.hexToMunsell(r.detail), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.detail)) },
+              colorThree: { value: r.primary, name: 'primary', munsellFormat: munsell.hexToMunsell(r.primary), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.primary)) },
+              colorFour: { value: r.secondary, name: 'secondary', munsellFormat: munsell.hexToMunsell(r.secondary), rgbFormat: munsell.munsellToRgb255(munsell.hexToMunsell(r.secondary)) },
+              rawResult: JSON.stringify(r),
+            })
+            break
+          default:
+            throw new Error('Unexpected platform')
+        }
+      })
+
+
+    }).catch(err => { 
+      setShowColorButtons(false)
+      setPhoto(null)
+      alert("No photo selected")
     })
   }
   const pressed = useSharedValue(false)
@@ -106,7 +143,11 @@ export default function MainScreen({ navigation }) {
     }
   })
   const startResultAnimation = () => {
-    fetchColors()
+
+    setColorName(colors.colorThree.name)
+    setHexFormat(colors.colorThree.value)
+    setMunsellFormat(colors.colorThree.munsellFormat)
+    setRgbFormat(colors.colorThree.rgbFormat)
     setShowCircles(true)
   }
   const resetApp = () => {
@@ -115,22 +156,10 @@ export default function MainScreen({ navigation }) {
     setPhoto(null)
   }
 
-
-  const fetchColors = async () => {
-    const result = await ImageColors.getColors(Photo, {
-      fallback: '#000000',
-      quality: 'low',
-      pixelSpacing: 5,
-      cache: true,
-      headers: {
-        authorization: 'Basic 123',
-      },
-    })
-
-
-
-  }
-
+  const [colorName, setColorName] = useState(colors.colorThree.name)
+  const [hexFormat, setHexFormat] = useState(colors.colorThree.value)
+  const [munsellFormat, setMunsellFormat] = useState(colors.colorThree.munsellFormat)
+  const [rgbFormat, setRgbFormat] = useState(colors.colorThree.rgbFormat)
 
 
   return (
@@ -172,24 +201,52 @@ export default function MainScreen({ navigation }) {
                   <View>
                     <View style={styles.circleContainer}>
 
-                      <Circle color={colors.colorOne.value} size={0.4} />
+                      <Circle color={colors.colorOne.value} size={0.4} onPress={() => {
+
+
+                        setColorName(colors.colorOne.name)
+                        setHexFormat(colors.colorOne.value)
+                        setMunsellFormat(colors.colorOne.munsellFormat)
+                        setRgbFormat(colors.colorOne.rgbFormat)
+
+                      }
+
+                      } />
                       <Gap gap={20} />
-                      <Circle color={colors.colorTwo.value} size={0.4} />
+                      <Circle color={colors.colorTwo.value} size={0.4} onPress={() => {
+
+                        setColorName(colors.colorTwo.name)
+                        setHexFormat(colors.colorTwo.value)
+                        setMunsellFormat(colors.colorTwo.munsellFormat)
+                        setRgbFormat(colors.colorTwo.rgbFormat)
+
+                      }} />
                       <Gap gap={20} />
-                      <Circle color={colors.colorThree.value} size={0.4} s />
+                      <Circle color={colors.colorThree.value} size={0.4} onPress={() => {
+
+                        setColorName(colors.colorThree.name)
+                        setHexFormat(colors.colorThree.value)
+                        setMunsellFormat(colors.colorThree.munsellFormat)
+                        setRgbFormat(colors.colorThree.rgbFormat)
+
+                      }} />
                       <Gap gap={20} />
-                      <Circle color={colors.colorFour.value} size={0.4} />
+                      <Circle color={colors.colorFour.value} size={0.4} onPress={() => {
+
+
+                        setColorName(colors.colorFour.name)
+                        setHexFormat(colors.colorFour.value)
+                        setMunsellFormat(colors.colorFour.munsellFormat)
+                        setRgbFormat(colors.colorFour.rgbFormat)
+
+
+                      }} />
                       <Gap gap={20} />
 
 
                     </View>
-                    <Animated.View  >
-                      <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize", color: colors.colorThree.value }} > {colors.colorThree.name}: </Text>
-                    </Animated.View>
+                    <ColorDetails colorName={colorName} hexFormat={hexFormat} munsellFormat={munsellFormat} rgbFormat={rgbFormat} />
 
-                    <Animated.View >
-                      <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize" }} >Munsell Format : {colors.colorThree.munsellFormat}</Text>
-                    </Animated.View>
                   </View>
 
                   <View style={styles.footer} >
@@ -265,27 +322,106 @@ export default function MainScreen({ navigation }) {
   );
 }
 
-const Circle = ({ color, size }) => {
+
+const ColorDetails = ({ colorName, hexFormat, rgbFormat, munsellFormat }) => {
+  const startingPosition = -45
+  const x = useSharedValue(0)
+  const y = useSharedValue(startingPosition)
+  const pressed = useSharedValue(false)
+
+  const eventHandler = useAnimatedGestureHandler({
+    onStart: (event, ctx) => {
+      pressed.value = true
+    },
+    onActive: (event, ctx) => {
+      x.value = 0 + event.translationX
+      y.value = startingPosition + event.translationY
+    },
+    onEnd: (event, ctx) => {
+      pressed.value = false
+      x.value = withSpring(0)
+      y.value = withSpring(startingPosition)
+    }
+  })
+  const AnimatedText = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: y.value }, { translateX: x.value }]
+    }
+  })
+  return (
+    <TouchableOpacity>
+
+      <PanGestureHandler onGestureEvent={eventHandler} >
 
 
+        <Animated.View style={[AnimatedText]}>
+          <Animated.View style={{ paddingBottom: 10 }}  >
+            <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize", color: hexFormat, fontSize: 25 }} >{colorName} : </Text>
+          </Animated.View>
 
+          <Animated.View >
+            <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize", color: "#F6EEE5" }} >Munsell Format : {munsellFormat}</Text>
+          </Animated.View>
+          <Animated.View >
+            <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize", color: "#F6EEE5" }} >Hex Format : {hexFormat}</Text>
+          </Animated.View>
+          <Animated.View >
+            <Text style={{ fontFamily: "Montserrat_600SemiBold", textTransform: "capitalize", color: "#F6EEE5" }} >RGB Format : {JSON.stringify(rgbFormat)}</Text>
+          </Animated.View>
+        </Animated.View>
+      </PanGestureHandler>
+
+    </TouchableOpacity>
+
+  )
+
+}
+const Circle = ({ color, size, onPress }) => {
+  const startingPosition = -100
+  const x = useSharedValue(0)
+  const y = useSharedValue(startingPosition)
+  const pressed = useSharedValue(false)
+  const eventHandler = useAnimatedGestureHandler({
+    onStart: (event, ctx) => {
+      pressed.value = true
+    },
+    onActive: (event, ctx) => {
+      x.value = 0 + event.translationX
+      y.value = startingPosition + event.translationY
+    },
+    onEnd: (event, ctx) => {
+      pressed.value = false
+      x.value = withSpring(0)
+      y.value = withSpring(startingPosition)
+    }
+  })
+  const circleAnimated = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: y.value }, { translateX: x.value }]
+    }
+  })
 
 
 
   return (
-
-    <TouchableOpacity>
-
-      <View style={{
-        backgroundColor: color,
-        width: 100 * size,
-        height: 100 * size,
-        borderRadius: 50 * size,
-      }} />
+    <TouchableOpacity  >
+      <PanGestureHandler onFailed={onPress} onGestureEvent={eventHandler} >
 
 
+        <Animated.View  style={[{
+          backgroundColor: color,
+          width: 100 * size,
+          height: 100 * size,
+          borderRadius: 50 * size,
+        }, circleAnimated]} />
 
+
+
+
+      </PanGestureHandler>
     </TouchableOpacity>
+
+
 
 
   )
@@ -315,8 +451,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     opacity: 0.9,
-
-
     borderRadius: 30,
 
   },

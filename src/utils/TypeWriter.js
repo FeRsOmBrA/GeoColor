@@ -14,11 +14,14 @@ const TypeWriter = ({text, styleView, styleText, dev}) => {
             setCurrentText((value) => value + text.charAt(index.current))
             index.current ++;
         }, 20 )
+
+
+        
         return () => {
             clearTimeout(timeoutId)
  
         }
-
+         
     }, [currentText,text])
     return (
         dev ? (

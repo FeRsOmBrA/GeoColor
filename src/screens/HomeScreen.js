@@ -26,13 +26,17 @@ const HomeScreen = ({ navigation }) => {
                <TypeWriter dev= {false} text="With this application, you can extract  main colors of any image and see each color representation in different formats as well." styleText={styles.welcomeText} styleView = {styles.welcome} />
 
             
+           
+           
 
             </View>
+       
             <View style={styles.footer} >
-            <TouchableOpacity onPress={()=> {navigation.navigate("MainScreen")}} style={styles.chooseButton} >
-               <Feather name='arrow-right' color= "white" size={24} />
-              <Text style={styles.btnText}>Let's try </Text>
-            </TouchableOpacity>
+               <TouchableOpacity onPress={()=> {navigation.navigate("MainScreen")}} style = {{paddingBottom: 12}}> 
+            <Feather   name='arrow-right' color= "white" size={100} />
+
+               </TouchableOpacity>
+    
           </View>
 
          </ImageBackground>
@@ -80,14 +84,13 @@ const styles = StyleSheet.create({
    },
 
    footer: {
+     flex: 1,
+      paddingTop: 40,
      
-      width: '100%',
-      height: '100%',
-      flex: 1,
       padding: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      zIndex: 1
+    
    },
    btn: {
       justifyContent: 'center',
