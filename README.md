@@ -40,6 +40,6 @@ GeoColor use the power of your device to sweep an image and extract the main col
 - HEX Format: A color model that defines colors based on their hexadecimal code. It uses a six-digit code made up of numbers and letters to represent the intensity of red, green, and blue light, such as #FF0000 for pure red.
 
 
-#Next Steps
+# Next Steps
 
 I'm currently developing more funcitonalities that you can use directly access on the Home Screen, such as coordinate conversion tool with different Projections, including the new Coordinate System of Colombia ORIGEN NACIONAL...
